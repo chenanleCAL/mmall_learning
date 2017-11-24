@@ -9,16 +9,58 @@ import com.mmall.pojo.User;
  */
 public interface IUserService {
 
+    /**
+     * 用户登录
+     *
+     * @param username
+     * @param password
+     * @return
+     */
     ServerResponse<User> login(String username, String password);
 
+    /**
+     * 用户注册
+     *
+     * @param user
+     * @return
+     */
     ServerResponse<String> register(User user);
 
-    ServerResponse<String> checkValid(String str,String type);
+    /**
+     * 检查用户是否有效
+     *
+     * @param str
+     * @param type
+     * @return
+     */
+    ServerResponse<String> checkValid(String str, String type);
 
+    /**
+     * 忘记密码
+     *
+     * @param username
+     * @return
+     */
     ServerResponse selectQuestion(String username);
 
-    ServerResponse<String> checkAnswer(String username,String question,String answer);
+    /**
+     * 提交问题答案
+     *
+     * @param username
+     * @param question
+     * @param answer
+     * @return
+     */
+    ServerResponse<String> checkAnswer(String username, String question, String answer);
 
+    /**
+     * 忘记密码的重置密码
+     *
+     * @param username
+     * @param passwordNew
+     * @param forgetToken
+     * @return
+     */
     ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken);
 }
 
