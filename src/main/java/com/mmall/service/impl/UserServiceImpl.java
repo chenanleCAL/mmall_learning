@@ -1,6 +1,7 @@
 package com.mmall.service.impl;
 
 import com.mmall.common.Const;
+import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.common.TokenCache;
 import com.mmall.dao.UserMapper;
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.UUID;
 
 /**
@@ -208,13 +210,13 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createByErrorMessage("密码更新失败");
     }
 
-
     /**
      * 更新用户个人信息
      *
      * @param user
      * @return
      */
+    @Override
     public ServerResponse<User> updateInformation(User user) {
         //username是不能被更行的
         //email也要进行一个验证，校验email是否已经存在，并且存在的email如果相同的话，不能是我们当前这个用户的
@@ -233,6 +235,22 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.cteateBySuccess("用户更新成功", updateUser);
         }
         return ServerResponse.createByErrorMessage("用户更新失败");
+    }
+
+    /**
+     * 获取用户详细信息
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public ServerResponse<User> getInformation(Integer userId) {
+        User user = userMapper.selectByPrimaryKey(userId);
+        if (user == null) {
+            return ServerResponse.createByErrorMessage("找不到当前用户");
+        }
+        user.setPassword(StringUtils.EMPTY);
+        return ServerResponse.cteateBySuccess(user);
     }
 
 
