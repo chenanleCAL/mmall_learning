@@ -184,4 +184,56 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createByErrorMessage("修改密码失败");
 
     }
+
+    /**
+     * 登录状态下重置密码
+     *
+     * @param passwordOld
+     * @param passwordNew
+     * @param user
+     * @return
+     */
+    @Override
+    public ServerResponse<String> ResetPassword(String passwordOld, String passwordNew, User user) {
+        //防止横向越权，要校验一下这个用户的久密码，一定要指定是这个用户，因为我们会查询一个count（1），如果不指定id，那么结果就是true，count>0
+        int resultCount = userMapper.checkPassword(MD5Util.MD5EncodeUtf8(passwordOld), user.getId());
+        if (resultCount == 0) {
+            return ServerResponse.createByErrorMessage("旧密码错误");
+        }
+        user.setPassword(MD5Util.MD5EncodeUtf8(passwordNew));
+        int updateCount = userMapper.updateByPrimaryKeySelective(user);
+        if (updateCount > 0) {
+            return ServerResponse.createBySuccessMessage("密码更新成功");
+        }
+        return ServerResponse.createByErrorMessage("密码更新失败");
+    }
+
+
+    /**
+     * 更新用户个人信息
+     *
+     * @param user
+     * @return
+     */
+    public ServerResponse<User> updateInformation(User user) {
+        //username是不能被更行的
+        //email也要进行一个验证，校验email是否已经存在，并且存在的email如果相同的话，不能是我们当前这个用户的
+        int countResult = userMapper.checkEmailByUserId(user.getEmail(), user.getId());
+        if (countResult > 0) {
+            return ServerResponse.createByErrorMessage("email已存在，请更换email再尝试更新");
+        }
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setEmail(user.getEmail());
+        updateUser.setAnswer(user.getAnswer());
+        updateUser.setQuestion(user.getQuestion());
+        updateUser.setPhone(user.getPhone());
+        int updateCount = userMapper.updateByPrimaryKeySelective(updateUser);
+        if (updateCount > 0) {
+            return ServerResponse.cteateBySuccess("用户更新成功", updateUser);
+        }
+        return ServerResponse.createByErrorMessage("用户更新失败");
+    }
+
+
 }
