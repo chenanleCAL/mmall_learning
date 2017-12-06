@@ -1,7 +1,6 @@
 package com.mmall.service.impl;
 
 import com.mmall.common.Const;
-import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.common.TokenCache;
 import com.mmall.dao.UserMapper;
@@ -12,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
 import java.util.UUID;
 
 /**
@@ -23,6 +21,7 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private UserMapper userMapper;
+
 
     /**
      * 用户登录
@@ -49,6 +48,7 @@ public class UserServiceImpl implements IUserService {
 
         return ServerResponse.cteateBySuccess("登录成功！", user);
     }
+
 
     /**
      * 用户注册
@@ -85,6 +85,7 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createBySuccessMessage("注册成功");
     }
 
+
     /**
      * 检查用户是否有效
      *
@@ -102,17 +103,18 @@ public class UserServiceImpl implements IUserService {
                     return ServerResponse.createByErrorMessage("用户名已存在！");
                 }
             }
-            if (Const.USERNAME.equals(type)) {
+            if (Const.EMAIL.equals(type)) {
                 int resultCount = userMapper.checkEmail(str);
                 if (resultCount > 0) {
                     return ServerResponse.createByErrorMessage("email已存在！");
                 }
-            } else {
-                return ServerResponse.createByErrorMessage("参数错误");
             }
+        } else {
+            return ServerResponse.createByErrorMessage("参数错误");
         }
         return ServerResponse.createBySuccessMessage("校验成功");
     }
+
 
     /**
      * 忘记密码
@@ -127,11 +129,13 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createByErrorMessage("用户不存在");
         }
         String question = userMapper.selectQuestionByUsername(username);
-        if (StringUtils.isNotBlank(question)) {
-            return ServerResponse.cteateBySuccess(question);
+        String answer = userMapper.selectAnswerByUsername(username);
+        if (StringUtils.isNotBlank(question) && StringUtils.isNotBlank(answer)) {
+            return ServerResponse.cteateBySuccess(question + "," + answer);
         }
         return ServerResponse.createByErrorMessage("找回密码的问题是空的");
     }
+
 
     /**
      * 提交问题答案
@@ -152,6 +156,7 @@ public class UserServiceImpl implements IUserService {
         }
         return ServerResponse.createByErrorMessage("问题的答案错误");
     }
+
 
     /**
      * 忘记密码的重置密码
@@ -187,6 +192,7 @@ public class UserServiceImpl implements IUserService {
 
     }
 
+
     /**
      * 登录状态下重置密码
      *
@@ -209,6 +215,7 @@ public class UserServiceImpl implements IUserService {
         }
         return ServerResponse.createByErrorMessage("密码更新失败");
     }
+
 
     /**
      * 更新用户个人信息
@@ -237,6 +244,7 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createByErrorMessage("用户更新失败");
     }
 
+
     /**
      * 获取用户详细信息
      *
@@ -251,6 +259,22 @@ public class UserServiceImpl implements IUserService {
         }
         user.setPassword(StringUtils.EMPTY);
         return ServerResponse.cteateBySuccess(user);
+    }
+
+
+    //backend
+
+    /**
+     * 校验一下是否是管理员
+     *
+     * @param user
+     * @return
+     */
+    public ServerResponse checkAdminRole(User user) {
+        if (user != null && user.getRole().intValue() == Const.Role.ROLE_ADMIN) {
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByError();
     }
 
 

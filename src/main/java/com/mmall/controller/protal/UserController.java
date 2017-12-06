@@ -23,6 +23,7 @@ public class UserController {
     @Autowired
     private IUserService iUserService;
 
+
     /**
      * 用户登录
      *
@@ -43,6 +44,7 @@ public class UserController {
         return response;
     }
 
+
     /**
      * 用户登出
      *
@@ -56,6 +58,7 @@ public class UserController {
         return ServerResponse.createBySuccess();
     }
 
+
     /**
      * 用户注册
      *
@@ -67,6 +70,7 @@ public class UserController {
     public ServerResponse<String> register(User user) {
         return iUserService.register(user);
     }
+
 
     /**
      * 用户校验（检查用户名是否有效）
@@ -80,6 +84,7 @@ public class UserController {
     public ServerResponse<String> checkValid(String str, String type) {
         return iUserService.checkValid(str, type);
     }
+
 
     /**
      * 获取登录用户信息
@@ -97,6 +102,7 @@ public class UserController {
         return ServerResponse.createByErrorMessage("用户未登录,无法获取当前用户的信息");
     }
 
+
     /**
      * 忘记密码
      *
@@ -108,6 +114,7 @@ public class UserController {
     public ServerResponse<String> forgetGetQuestion(String username) {
         return iUserService.selectQuestion(username);
     }
+
 
     /**
      * 提交问题及答案
@@ -123,6 +130,7 @@ public class UserController {
         return iUserService.checkAnswer(username, question, answer);
     }
 
+
     /**
      * 忘记密码的重置密码
      *
@@ -136,6 +144,7 @@ public class UserController {
     public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
         return iUserService.forgetResetPassword(username, passwordNew, forgetToken);
     }
+
 
     /**
      * 登录状态下重置密码
@@ -154,6 +163,7 @@ public class UserController {
         }
         return iUserService.ResetPassword(passwordOld, passwordNew, user);
     }
+
 
     /**
      * 更新用户个人信息
@@ -179,6 +189,7 @@ public class UserController {
         return response;
 
     }
+
 
     /**
      * 获取用户详细信息

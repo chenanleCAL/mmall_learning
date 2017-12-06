@@ -9,6 +9,7 @@ import com.mmall.pojo.User;
  */
 public interface IUserService {
 
+
     /**
      * 用户登录
      *
@@ -18,6 +19,7 @@ public interface IUserService {
      */
     ServerResponse<User> login(String username, String password);
 
+
     /**
      * 用户注册
      *
@@ -25,6 +27,7 @@ public interface IUserService {
      * @return
      */
     ServerResponse<String> register(User user);
+
 
     /**
      * 检查用户是否有效
@@ -35,6 +38,7 @@ public interface IUserService {
      */
     ServerResponse<String> checkValid(String str, String type);
 
+
     /**
      * 忘记密码
      *
@@ -42,6 +46,7 @@ public interface IUserService {
      * @return
      */
     ServerResponse selectQuestion(String username);
+
 
     /**
      * 提交问题答案
@@ -53,6 +58,7 @@ public interface IUserService {
      */
     ServerResponse<String> checkAnswer(String username, String question, String answer);
 
+
     /**
      * 忘记密码的重置密码
      *
@@ -62,6 +68,7 @@ public interface IUserService {
      * @return
      */
     ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken);
+
 
     /**
      * 登录状态下重置密码
@@ -73,6 +80,7 @@ public interface IUserService {
      */
     ServerResponse<String> ResetPassword(String passwordOld, String passwordNew, User user);
 
+
     /**
      * 更新用户个人信息
      *
@@ -81,6 +89,7 @@ public interface IUserService {
      */
     ServerResponse<User> updateInformation(User user);
 
+
     /**
      * 获取用户详细信息
      *
@@ -88,5 +97,14 @@ public interface IUserService {
      * @return
      */
     ServerResponse<User> getInformation(Integer userId);
+
+
+    /**
+     * 校验一下是否是管理员
+     *
+     * @param user
+     * @return
+     */
+    ServerResponse checkAdminRole(User user);
 }
 
