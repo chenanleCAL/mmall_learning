@@ -117,7 +117,8 @@ public class CategoryManageController {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录");
         }
         if (iUserService.checkAdminRole(user).isSuccess()) {
-            //查询子节点的category信息，递归
+            //查询当前节点的id和递归子节点的ID
+            //0--->10000--->100000
             return iCategoryService.selectCategoryAndChildrenById(categoryId);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作，需要管理员权限");
