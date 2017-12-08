@@ -1,5 +1,8 @@
 package com.mmall.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.dao.CategoryMapper;
@@ -10,9 +13,12 @@ import com.mmall.service.IProductService;
 import com.mmall.util.DateTimeUtil;
 import com.mmall.util.PropertiesUtil;
 import com.mmall.vo.ProductDetailVo;
+import com.mmall.vo.ProductListVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Created by chenanle on 2017/12/7.
@@ -33,7 +39,8 @@ public class ProductServiceImpl implements IProductService {
      * @param product
      * @return
      */
-    public ServerResponse saveOrUpdateProduc(Product product) {
+    @Override
+    public ServerResponse saveOrUpdateProduct(Product product) {
         if (product != null) {
             if (StringUtils.isNotBlank(product.getSubImages())) {
                 String[] subImagesArray = product.getSubImages().split(",");
@@ -66,6 +73,7 @@ public class ProductServiceImpl implements IProductService {
      * @param status
      * @return
      */
+    @Override
     public ServerResponse<String> updateSaleStatus(Integer productId, Integer status) {
         if (productId == null || status == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
@@ -87,6 +95,7 @@ public class ProductServiceImpl implements IProductService {
      * @param productId
      * @return
      */
+    @Override
     public ServerResponse<ProductDetailVo> manageProductDetail(Integer productId) {
         if (productId == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
@@ -113,7 +122,6 @@ public class ProductServiceImpl implements IProductService {
         productDetailVo.setStock(product.getStock());
         productDetailVo.setStatus(product.getStatus());
         productDetailVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix", "http://img.happymmall.com/"));
-
         Category category = categoryMapper.selectByPrimaryKey(product.getCategoryId());
         if (category == null) {
             productDetailVo.setParentCategoryId(0);
@@ -122,8 +130,43 @@ public class ProductServiceImpl implements IProductService {
         }
         productDetailVo.setCreateTime(DateTimeUtil.dateToStr(product.getCreateTime()));
         productDetailVo.setUpdateTime(DateTimeUtil.dateToStr(product.getUpdateTime()));
-
         return productDetailVo;
-
     }
+
+
+    /**
+     * 后台商品列表动态分页功能开发
+     *
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public ServerResponse<PageInfo> getProductList(int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<Product> productList = productMapper.selectList();
+        List<ProductListVo> productListVoList = Lists.newArrayList();
+        for (Product productItem : productList) {
+            ProductListVo productListVo = assembleProductListVo(productItem);
+            productListVoList.add(productListVo);
+        }
+        PageInfo pageResult = new PageInfo();
+        pageResult.setList(productListVoList);
+        return ServerResponse.cteateBySuccess(pageResult);
+    }
+
+
+    private ProductListVo assembleProductListVo(Product product) {
+        ProductListVo productListVo = new ProductListVo();
+        productListVo.setId(product.getId());
+        productListVo.setName(product.getName());
+        productListVo.setMainImage(product.getMainImage());
+        productListVo.setCategoryId(product.getCategoryId());
+        productListVo.setPrice(product.getPrice());
+        productListVo.setStatus(product.getStatus());
+        productListVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix", "http://img.happymmall.com/"));
+        return productListVo;
+    }
+
+
 }
