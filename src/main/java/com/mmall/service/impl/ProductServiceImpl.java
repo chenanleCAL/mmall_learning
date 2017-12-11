@@ -156,6 +156,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
 
+    //product转化成productListVo
     private ProductListVo assembleProductListVo(Product product) {
         ProductListVo productListVo = new ProductListVo();
         productListVo.setId(product.getId());
@@ -168,5 +169,31 @@ public class ProductServiceImpl implements IProductService {
         return productListVo;
     }
 
+
+    /**
+     * 后台商品搜索功能开发
+     *
+     * @param productName
+     * @param productId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public ServerResponse<PageInfo> searchProduct(String productName, Integer productId, int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        if (StringUtils.isNotBlank(productName)) {
+            productName = new StringBuffer().append("%").append(productName).toString();
+        }
+        List<Product> productList = productMapper.selectByProductNameAndProductId(productName, productId);
+        List<ProductListVo> productListVoList = Lists.newArrayList();
+        for (Product productItem : productList) {
+            ProductListVo productListVo = assembleProductListVo(productItem);
+            productListVoList.add(productListVo);
+        }
+        PageInfo pageResult = new PageInfo();
+        pageResult.setList(productListVoList);
+        return ServerResponse.cteateBySuccess(pageResult);
+    }
 
 }

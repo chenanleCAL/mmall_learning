@@ -117,4 +117,29 @@ public class ProductManageController {
         }
     }
 
+
+    /**
+     * 后台商品搜索功能开发
+     *
+     * @param session
+     * @param productName
+     * @param productId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping("search_product.do")
+    @ResponseBody
+    public ServerResponse searchProduct(HttpSession session, String productName, Integer productId, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum, @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录管理员账号");
+        }
+        if (iUserService.checkAdminRole(user).isSuccess()) {
+            return iProductService.searchProduct(productName, productId, pageNum, pageSize);
+        } else {
+            return ServerResponse.createByErrorMessage("无操作权限");
+        }
+    }
+
 }
