@@ -154,6 +154,14 @@ public class ProductManageController {
     }
 
 
+    /**
+     * 后台商品图片的springmvc上传与富文本上传ftp服务器的功能
+     *
+     * @param session
+     * @param file
+     * @param request
+     * @return
+     */
     @RequestMapping("upload.do")
     @ResponseBody
     public ServerResponse upload(HttpSession session, @RequestParam(value = "upload_file", required = false) MultipartFile file, HttpServletRequest request) {
@@ -176,6 +184,15 @@ public class ProductManageController {
     }
 
 
+    /**
+     * 后台商品图片的springmvc上传与富文本上传ftp服务器的功能
+     *
+     * @param session
+     * @param file
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping("richtext_img_upload.do")
     @ResponseBody
     public Map richtextImgUpload(HttpSession session, @RequestParam(value = "upload_file", required = false) MultipartFile file, HttpServletRequest request, HttpServletResponse response) {
@@ -203,7 +220,7 @@ public class ProductManageController {
             resultMap.put("success", true);
             resultMap.put("msg", "上传成功");
             resultMap.put("file_path", url);
-            response.addHeader("Access-Control-Allow-Headers","X-File_Name");
+            response.addHeader("Access-Control-Allow-Headers", "X-File_Name");
             return resultMap;
         } else {
             resultMap.put("success", false);
