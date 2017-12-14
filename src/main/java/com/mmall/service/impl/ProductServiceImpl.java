@@ -189,7 +189,7 @@ public class ProductServiceImpl implements IProductService {
     public ServerResponse<PageInfo> searchProduct(String productName, Integer productId, int pageNum, int pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         if (StringUtils.isNotBlank(productName)) {
-            productName = new StringBuffer().append("%").append(productName).toString();
+            productName = new StringBuffer().append("%").append(productName).append("%").toString();
         }
         List<Product> productList = productMapper.selectByProductNameAndProductId(productName, productId);
         List<ProductListVo> productListVoList = Lists.newArrayList();
@@ -242,7 +242,7 @@ public class ProductServiceImpl implements IProductService {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
         List<Integer> categoryIdList = new ArrayList<>();
-        if (categoryId == null) {
+        if (categoryId != null) {
             Category category = categoryMapper.selectByPrimaryKey(categoryId);
             if (category == null && StringUtils.isBlank(keyword)) {
                 //没有该分类，并且还没有关键字，这个时候返回空结果集，不报错
