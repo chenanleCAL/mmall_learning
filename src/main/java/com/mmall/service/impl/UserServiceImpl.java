@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -236,6 +237,7 @@ public class UserServiceImpl implements IUserService {
         updateUser.setAnswer(user.getAnswer());
         updateUser.setQuestion(user.getQuestion());
         updateUser.setPhone(user.getPhone());
+        updateUser.setUpdateTime(new Date());
         int updateCount = userMapper.updateByPrimaryKeySelective(updateUser);
         if (updateCount > 0) {
             return ServerResponse.cteateBySuccess("用户更新成功", updateUser);
