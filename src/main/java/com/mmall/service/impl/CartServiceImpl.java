@@ -1,5 +1,6 @@
 package com.mmall.service.impl;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Lists;
 import com.mmall.common.Const;
@@ -33,6 +34,23 @@ public class CartServiceImpl implements ICartService {
     @Autowired
     private ProductMapper productMapper;
 
+    public ServerResponse<CartVo> selectUnselect(Integer userId,Integer productId,Integer checked) {
+        cartMapper.checkedOrUncheckedProduct(userId,productId,checked);
+        return this.list(userId);
+    }
+
+    public ServerResponse<Integer> getCartProductCount(Integer userId) {
+        if (userId == null) {
+            return ServerResponse.cteateBySuccess(0);
+        }
+        return ServerResponse.cteateBySuccess(cartMapper.selectCartProductCount(userId));
+    }
+
+    public ServerResponse<CartVo> list(Integer userId) {
+        CartVo cartVo = this.getCartVoLimit(userId);
+        return ServerResponse.cteateBySuccess(cartVo);
+    }
+
     public ServerResponse<CartVo> add(Integer userId, Integer productId, Integer count) {
         if (productId == null || count == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
@@ -53,23 +71,44 @@ public class CartServiceImpl implements ICartService {
             cart.setQuantity(count);
             cartMapper.updateByPrimaryKeySelective(cart);
         }
-        CartVo cartVo = this.getCartVoLimit(userId);
-        return ServerResponse.cteateBySuccess(cartVo);
+        return this.list(userId);
+    }
+
+    public ServerResponse<CartVo> update(Integer userId, Integer productId, Integer count) {
+        if (productId == null || count == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        Cart cart = cartMapper.selectCartByUserIdProductId(userId, productId);
+        if (cart != null) {
+            cart.setQuantity(count);
+        }
+        cartMapper.updateByPrimaryKeySelective(cart);
+        return this.list(userId);
+    }
+
+    public ServerResponse<CartVo> deleteProduct(Integer userId, String productIds) {
+        List<String> productList = Splitter.on(",").splitToList(productIds);
+        if (CollectionUtils.isEmpty(productList)) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        cartMapper.deleteByUserIdProductIds(userId, productList);
+        return this.list(userId);
+
     }
 
     private CartVo getCartVoLimit(Integer userId) {
         CartVo cartVo = new CartVo();
-        List<Cart> cartList = cartMapper.selectCartByUserId(userId);
+        List<Cart> cartList = cartMapper.selectCartByUserId(userId);//根据userid查出cart表里所有的数据
         List<CartProductVo> cartProductVoList = Lists.newArrayList();
 
-        BigDecimal cartTotalPrice = new BigDecimal("0");//整个购物车的总价
+        BigDecimal cartTotalPrice = new BigDecimal("0");//整个购物车的总价,初始化为0
         if (CollectionUtils.isNotEmpty(cartList)) {
             for (Cart cartItem : cartList) {
-                CartProductVo cartProductVo = new CartProductVo();
+                CartProductVo cartProductVo = new CartProductVo();//商品和购物车的结合
                 cartProductVo.setId(cartItem.getId());
                 cartProductVo.setUserId(userId);
                 cartProductVo.setProductId(cartItem.getProductId());
-                Product product = productMapper.selectByPrimaryKey(cartItem.getProductId());
+                Product product = productMapper.selectByPrimaryKey(cartItem.getProductId());//根据productid查出product表里所有的数据
                 if (product != null) {
                     cartProductVo.setProductMainImage(product.getMainImage());
                     cartProductVo.setProductName(product.getName());
@@ -112,6 +151,7 @@ public class CartServiceImpl implements ICartService {
         return cartVo;
     }
 
+    //当前用户选中的个数
     private boolean getAllCheckedStatus(Integer userId) {
         if (userId == null) {
             return false;
