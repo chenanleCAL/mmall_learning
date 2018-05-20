@@ -24,7 +24,7 @@ public class ShippingServiceImpl implements IShippingService {
     private ShippingMapper shippingMapper;
 
     public ServerResponse add(Integer userId, Shipping shipping) {
-        shipping.setId(shipping.getId());
+        shipping.setUserId(userId);
         int rowCount = shippingMapper.insert(shipping);
         if (rowCount > 0) {
             Map result = Maps.newHashMap();
@@ -44,7 +44,6 @@ public class ShippingServiceImpl implements IShippingService {
 
     public ServerResponse update(Integer userId, Shipping shipping) {
         shipping.setUserId(userId);
-        shipping.setId(shipping.getId());
         int rowCount = shippingMapper.updateByShipping(shipping);
         if (rowCount > 0) {
             return ServerResponse.cteateBySuccess("更新地址成功");
