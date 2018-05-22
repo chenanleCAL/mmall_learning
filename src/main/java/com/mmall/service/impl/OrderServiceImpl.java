@@ -211,7 +211,7 @@ public class OrderServiceImpl implements IOrderService {
                 return ServerResponse.cteateBySuccess("发货成功");
             }
         }
-        return ServerResponse.createByErrorMessage("订单不存在");
+        return ServerResponse.createByErrorMessage("该订单未支付");
     }
 
     private List<OrderVo> assembleOrderVoList(Integer userId, List<Order> orderList) {
